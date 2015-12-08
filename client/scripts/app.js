@@ -9,14 +9,7 @@ app.init = function() {
   // });
   // //app.clearMessages();
 
-  $('#main').on('click', '.username', function(e) {
-    app.addFriend(e.target.innerHTML);
-  });
 
-  $('#send').on('submit', function(e){
-    app.handleSubmit( $('#message').val() );
-    e.preventDefault();
-  });
 };
 
 app.send = function(message) {
@@ -72,4 +65,13 @@ app.handleSubmit = function (message) {
 
 $(document).ready(function(){
   app.init();
+
+  $('#main').on('click', '.username', function(e) {
+    app.addFriend(e.target.innerHTML);
+  });
+
+  $('#send').on('submit', function(e){
+    app.handleSubmit( $('#message').val() );
+    e.preventDefault();
+  });
 });
