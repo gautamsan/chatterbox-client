@@ -1,14 +1,10 @@
 var app = {};
 app.server = 'https://api.parse.com/1/classes/chatterbox' //used for all requests
 app.messages = [];
-
+app.intervalID;
+app.stop = function () { clearInterval(app.intervalID) };
 app.init = function() {
-  // app.addMessage({
-  //   username: 'Mel Brooks',
-  //   text: 'Never underestimate the power of the Schwartz!',
-  //   roomname: 'lobby',
-  //   updatedAt: "2015-09-01T01:00:42.028Z"
-  // });
+
   // //app.clearMessages();
 
 
@@ -29,16 +25,17 @@ app.send = function(message) {
   });
 };
 
-app.fetch = function(callback) {
+app.fetch = function(callback, queryString) {
+  queryString = queryString || '';
   $.ajax({
-    url: app.server + "?order=-createdAt",
+    url: app.server + queryString,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
       if(callback) {
         callback(data);
       }
-      console.log('chatterbox: Message received. Data: ', data);
+      //console.log('chatterbox: Message received. Data: ', data);
     },
     error: function (data) {
       console.error('chatterbox: Failed to receive message. Error: ', data);
@@ -52,7 +49,7 @@ app.clearMessages = function() {
 
 app.addMessage = function(message) {
   var $chats = $('#chats');
-  var newChat = message.text;
+  var newChat = String( message.text );
   $chats.append('<div><a class="username" href="#">' + message.username + '</a>' + newChat + '</div>');
 };
 
@@ -64,8 +61,20 @@ app.addFriend = function (friend) {
 
 };
 
-app.handleSubmit = function (message) {
-  console.log(message);
+app.escapeCharacters = function(text) {
+  //prevent some XSS attack
+  text = text.replace(/[<>']+/g, '');
+  return text;
+};
+
+app.handleSubmit = function (messageText) {
+  var message = {
+    username: app.escapeCharacters(window.location.search.slice(10)),
+    text: app.escapeCharacters(messageText),
+    roomName: 'lobby'
+  };
+  console.log(messageText);
+  app.send(message);
 };
 
 app.getMessages = function(roomName) {
@@ -73,7 +82,7 @@ app.getMessages = function(roomName) {
     app.clearMessages();
     //app.messages = app.messages.concat(data.results);
     data.results.forEach(app.addMessage);
-  })
+  }, "?order=-createdAt")
 }
 
 $(document).ready(function(){
@@ -88,7 +97,7 @@ $(document).ready(function(){
     e.preventDefault();
   });
   app.getMessages();
-  setInterval(function() {
+  app.intervalID = setInterval(function() {
     app.getMessages();
   }, 5000);
 
