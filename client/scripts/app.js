@@ -1,5 +1,7 @@
 var app = {};
 app.server = 'https://api.parse.com/1/classes/chatterbox' //used for all requests
+app.messages = [];
+
 app.init = function() {
   // app.addMessage({
   //   username: 'Mel Brooks',
@@ -27,12 +29,15 @@ app.send = function(message) {
   });
 };
 
-app.fetch = function() {
+app.fetch = function(callback) {
   $.ajax({
     url: app.server,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
+      if(callback) {
+        callback(data);
+      }
       console.log('chatterbox: Message received. Data: ', data);
     },
     error: function (data) {
@@ -63,6 +68,13 @@ app.handleSubmit = function (message) {
   console.log(message);
 };
 
+app.getMessages = function(roomName) {
+  app.fetch(function(data) {
+    //app.messages = app.messages.concat(data.results);
+    data.results.forEach(app.addMessage);
+  })
+}
+
 $(document).ready(function(){
   app.init();
 
@@ -74,4 +86,7 @@ $(document).ready(function(){
     app.handleSubmit( $('#message').val() );
     e.preventDefault();
   });
+
+  app.fetch();
+  app.getMessages();
 });
