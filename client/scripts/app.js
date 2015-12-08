@@ -7,7 +7,16 @@ app.init = function() {
   //   roomname: 'lobby',
   //   updatedAt: "2015-09-01T01:00:42.028Z"
   // });
-  // app.clearMessages();
+  // //app.clearMessages();
+
+  $('#main').on('click', '.username', function(e) {
+    app.addFriend(e.target.innerHTML);
+  });
+
+  $('#send').on('submit', function(e){
+    app.handleSubmit( $('#message').val() );
+    e.preventDefault();
+  });
 };
 
 app.send = function(message) {
@@ -23,7 +32,7 @@ app.send = function(message) {
       console.error('chatterbox: Failed to send message. Error: ', data);
     }
   });
-}
+};
 
 app.fetch = function() {
   $.ajax({
@@ -37,21 +46,29 @@ app.fetch = function() {
       console.error('chatterbox: Failed to receive message. Error: ', data);
     }
   });
-}
+};
 
 app.clearMessages = function() {
   $('#chats').html('');
-}
+};
 
 app.addMessage = function(message) {
   var $chats = $('#chats');
   var newChat = message.text;
-  $chats.append('<div>' + newChat + '</div');
-}
+  $chats.append('<div><a class="username" href="#">' + message.username + '</a>' + newChat + '</div>');
+};
 
-app.addRoom = function() {
-  
-}
+app.addRoom = function(roomName) {
+  $('#roomSelect').append($('<option>'+ roomName +'</option>'))
+};
+
+app.addFriend = function (friend) {
+
+};
+
+app.handleSubmit = function (message) {
+  console.log(message);
+};
 
 $(document).ready(function(){
   app.init();
