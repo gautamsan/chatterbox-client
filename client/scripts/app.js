@@ -31,7 +31,7 @@ app.send = function(message) {
 
 app.fetch = function(callback) {
   $.ajax({
-    url: app.server,
+    url: app.server + "?order=-createdAt",
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
@@ -70,6 +70,7 @@ app.handleSubmit = function (message) {
 
 app.getMessages = function(roomName) {
   app.fetch(function(data) {
+    app.clearMessages();
     //app.messages = app.messages.concat(data.results);
     data.results.forEach(app.addMessage);
   })
@@ -86,7 +87,9 @@ $(document).ready(function(){
     app.handleSubmit( $('#message').val() );
     e.preventDefault();
   });
-
-  app.fetch();
   app.getMessages();
+  setInterval(function() {
+    app.getMessages();
+  }, 5000);
+
 });
